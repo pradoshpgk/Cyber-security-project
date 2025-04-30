@@ -3,7 +3,7 @@ from datetime import datetime
 
 scanner = nmap.PortScanner()
 target = input("Enter the IP address or domain to scan: ")
-port_range = input("Enter port range (e.g., 1-1024) or leave empty for default: ") or "1-1000"
+port_range = input("Enter port range (e.g., 1-1024) or leave empty for default: ") 
 
 print(f"\nStarting scan on {target}...\n")
 
