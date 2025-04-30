@@ -1,0 +1,48 @@
+import nmap
+from datetime import datetime
+
+scanner = nmap.PortScanner()
+target = input("Enter the IP address or domain to scan: ")
+port_range = input("Enter port range (e.g., 1-1024) or leave empty for default: ") or "1-1000"
+
+print(f"\nStarting scan on {target}...\n")
+
+scanner.scan(target, port_range, arguments='-sV -Pn')
+
+report = []
+report.append(f"Vulnerability Scan Report for {target}")
+report.append(f"Scan Time: {datetime.now()}")
+report.append("-" * 50)
+
+for host in scanner.all_hosts():
+    report.append(f"\nHost: {host} ({scanner[host].hostname()})")
+    report.append(f"State: {scanner[host].state()}")
+
+    for proto in scanner[host].all_protocols():
+        report.append(f"\nProtocol: {proto.upper()}")
+
+        ports = scanner[host][proto].keys()
+        for port in sorted(ports):
+            service = scanner[host][proto][port]['name']
+            product = scanner[host][proto][port]['product']
+            version = scanner[host][proto][port]['version']
+            extra_info = scanner[host][proto][port]['extrainfo']
+
+            report.append(f"Port: {port}")
+            report.append(f"  Service: {service}")
+            report.append(f"  Product: {product if product else 'Unknown'}")
+            report.append(f"  Version: {version if version else 'Unknown'}")
+            if extra_info:
+                report.append(f"  Extra Info: {extra_info}")
+
+report.append("\n--- Scan Complete ---")
+
+for line in report:
+    print(line)
+
+filename = f"scan_report_{target.replace('.', '_')}.txt"
+with open(filename, "w") as file:
+    for line in report:
+        file.write(line + "\n")
+
+print(f"\nScan report saved as {filename}")
